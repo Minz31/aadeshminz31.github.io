@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aadesh Minz – Terminal Portfolio</title>
 
-  <!-- Crypto Tooling -->
+  <!-- Crypto Tooling (optional, leave if you plan to add crypto demos later) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.0.0/jsencrypt.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
@@ -15,15 +15,44 @@
       --fg: #33ff33;
       --border: #33ff33;
     }
-    body { font-family: 'Courier New', monospace; margin: 0; padding: 0; background: var(--bg); color: var(--fg); }
-    header, footer { background: #111; text-align: center; padding: 1em; border: 1px solid var(--border); }
-    nav ul { list-style: none; padding: 0; text-align: center; }
-    nav li { display: inline; margin: 0 15px; }
-    a { color: var(--fg); text-decoration: none; }
-    section { max-width: 800px; margin: 20px auto; padding: 20px; background: #111; border: 1px solid var(--border); box-shadow: 0 0 10px var(--border); }
-    /* hide all on load, JS toggles */
-    section { display: none; }
-    section.active { display: block; }
+    body {
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--fg);
+    }
+    header, footer {
+      background: #111;
+      text-align: center;
+      padding: 1em;
+      border: 1px solid var(--border);
+    }
+    nav ul {
+      list-style: none;
+      padding: 0;
+      text-align: center;
+    }
+    nav li {
+      display: inline;
+      margin: 0 15px;
+    }
+    a {
+      color: var(--fg);
+      text-decoration: none;
+    }
+    section {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #111;
+      border: 1px solid var(--border);
+      box-shadow: 0 0 10px var(--border);
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
   </style>
 </head>
 
@@ -77,49 +106,49 @@
   <section id="experience">
     <h2>💼 Experience & Awards</h2>
 
-    ### Research Fellow – DA-IICT
-    *Aug 2024 – Present*  
-    - Probabilistic Forecasting Models for Wind-Speed Prediction  
-    - Quantile-based DL (QR, LSTM, GRU, TCN) → +15 % confidence accuracy  
-    - Upcoming publication in progress
+    <h3>Research Fellow – DA-IICT</h3>
+    <p><em>Aug 2024 – Present</em></p>
+    <ul>
+      <li>Probabilistic Forecasting Models for Wind-Speed Prediction</li>
+      <li>Quantile-based DL (QR, LSTM, GRU, TCN) → +15 % confidence accuracy</li>
+      <li>Upcoming publication in progress</li>
+    </ul>
 
-    <!-- ===== Teaching Assistant – Jan 2025–May 2025 ===== -->
-<section id="teaching-assistant">
-  <h2>👨‍🏫 Teaching Assistant – Machine Learning Forecasting</h2>
-  <p><strong>DA-IICT</strong> | Jan 2025 – May 2025 (5 months)</p>
-  <ul>
-    <li>Co-led lectures & labs on regression, ARIMA, RNNs, LSTMs, DeepAR, TimeGPT</li>
-    <li>Designed hands-on labs with finance, energy & sustainability datasets</li>
-    <li>Guided 60+ students through end-to-end forecasting pipelines in Python</li>
-  </ul>
-</section>
+    <h3>Teaching Assistant – Machine Learning Forecasting</h3>
+    <p><em>DA-IICT | Jan 2025 – May 2025 (5 months)</em></p>
+    <ul>
+      <li>Co-led lectures & labs on regression, ARIMA, RNNs, LSTMs, DeepAR, TimeGPT</li>
+      <li>Designed hands-on labs with finance, energy & sustainability datasets</li>
+      <li>Guided 60+ students through end-to-end forecasting pipelines in Python</li>
+    </ul>
   </section>
-<style>
-  #teaching-assistant { max-width: 800px; margin: 20px auto; padding: 20px; background: #111; border: 1px solid #33ff33; box-shadow: 0 0 10px #33ff33; color: #33ff33; font-family: 'Courier New', monospace; }
-  h2 { margin-top: 0; }
-  ul { padding-left: 20px; }
-</style>
+
   <!-- ===== Projects ===== -->
   <section id="projects">
     <h2>🚀 Flagship Projects</h2>
 
-    ### Smart Test Selection for CI Pipelines
-    *Tech:* Python, PLBART, Ekstazi, scikit-learn  
-    - Hybrid RTS skips **~70 %** tests with **0 % bug-miss** rate; 3× precision gain.
+    <h3>Smart Test Selection for CI Pipelines</h3>
+    <p><em>Tech:</em> Python, PLBART, Ekstazi, scikit-learn</p>
+    <ul>
+      <li>Hybrid RTS skips <strong>~70 %</strong> tests with <strong>0 % bug-miss</strong> rate; 3× precision gain.</li>
+    </ul>
 
-    ### Crisis Data Summarization
-    *Tech:* BM25, BERT, BART, Hugging Face, NLP  
-    - Real-time summarizer for emergency responders → near SOTA on TREC benchmark.
+    <h3>Crisis Data Summarization</h3>
+    <p><em>Tech:</em> BM25, BERT, BART, Hugging Face, NLP</p>
+    <ul>
+      <li>Real-time summarizer for emergency responders → near SOTA on TREC benchmark.</li>
+    </ul>
   </section>
 
   <!-- ===== Volunteering ===== -->
   <section id="volunteering">
     <h2>🤝 Volunteering</h2>
 
-    ### Student Volunteer – VandeMataram Foundation, Hyderabad, Telangana
-    *Jan 2022 – Dec 2023*  
-    - Data analysis & project management for education, healthcare, women-empowerment & sustainability initiatives.
-
+    <h3>Student Volunteer – VandeMataram Foundation, Hyderabad, Telangana</h3>
+    <p><em>Jan 2022 – Dec 2023</em></p>
+    <ul>
+      <li>Data analysis & project management for education, healthcare, women-empowerment & sustainability initiatives.</li>
+    </ul>
   </section>
 
   <footer>
