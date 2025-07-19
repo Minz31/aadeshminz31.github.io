@@ -13,12 +13,13 @@
       --text: #333;
       --heading: #111;
       --light: #555;
-      /* Adjusted for better glass effect */
       --card-bg: rgba(255, 255, 255, 0.4);
       --header-bg: rgba(255, 255, 255, 0.7);
       --shadow: 0 2px 4px rgba(0,0,0,0.05);
       --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
       --plexus-color: '#888';
+      /* NEW: Variables for glowing border */
+      --glow-color: rgba(10, 102, 194, 0.5);
     }
 
     html[data-theme='dark'] {
@@ -27,65 +28,137 @@
       --text: #ccc;
       --heading: #fff;
       --light: #888;
-      /* Adjusted for better glass effect */
       --card-bg: rgba(42, 42, 42, 0.4);
       --header-bg: rgba(26, 26, 26, 0.7);
       --shadow: 0 2px 4px rgba(0,0,0,0.4);
       --card-shadow: 0 1px 3px rgba(0,0,0,0.5);
       --plexus-color: '#ccc';
+      /* NEW: Variables for glowing border */
+      --glow-color: rgba(77, 171, 247, 0.6);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* --- KEY CHANGE FOR PLEXUS VISIBILITY --- */
+    /* NEW: Smooth scrolling behavior */
+    html {
+        scroll-behavior: smooth;
+    }
+
     body {
       font-family: -apple-system, system-ui, sans-serif;
-      background-color: transparent; /* Body is now transparent */
+      background-color: transparent;
       color: var(--text);
       line-height: 1.6;
       transition: color 0.3s;
-      position: relative; /* Needed for z-index stacking */
+      position: relative;
+      /* NEW: Hide default cursor */
+      cursor: none;
     }
 
-    /* Gradient is moved to a pseudo-element behind the canvas */
     body::before {
       content: '';
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2; /* Layer behind canvas */
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -2;
       background-image: radial-gradient(circle at top left, #e0e0e0, #f5f7fa);
       transition: background-image 0.3s;
     }
 
     html[data-theme='dark'] body::before {
-       background-image: radial-gradient(circle at top left, #051937, #1a1a1a);
+        background-image: radial-gradient(circle at top left, #051937, #1a1a1a);
     }
-    /* --- END KEY CHANGE --- */
 
-
-    a { color: var(--accent); text-decoration: none; }
+    a { color: var(--accent); text-decoration: none; cursor: none; /* NEW: Cursor style */ }
 
     #plexus-container {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1; /* Canvas is on top of the pseudo-element, but behind content */
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
     }
 
-    /* Header updated for a consistent glass effect */
+    /* --- NEW: PRELOADER STYLES --- */
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999;
+        background-color: var(--bg-alt);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+    #preloader.loaded {
+        opacity: 0;
+        visibility: hidden;
+    }
+    .loader-spinner {
+        border: 4px solid color-mix(in srgb, var(--accent) 20%, transparent);
+        border-top: 4px solid var(--accent);
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    /* --- END PRELOADER STYLES --- */
+
+
+    /* --- NEW: CUSTOM CURSOR STYLES --- */
+    .cursor-dot, .cursor-outline {
+        pointer-events: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+        z-index: 9990;
+        transition: opacity 0.3s, transform 0.3s;
+    }
+    .cursor-dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--accent);
+    }
+    .cursor-outline {
+        width: 40px;
+        height: 40px;
+        background-color: rgba(10, 102, 194, 0.2);
+        transition: transform 0.2s ease-out, width 0.3s ease, height 0.3s ease;
+    }
+    html[data-theme='dark'] .cursor-outline {
+        background-color: rgba(77, 171, 247, 0.2);
+    }
+    /* Cursor hover effect */
+    .cursor-outline.hover {
+        transform: scale(1.5);
+        width: 50px;
+        height: 50px;
+    }
+    /* --- END CURSOR STYLES --- */
+
+    /* Header updated for dynamic scroll effect */
     header {
       background: var(--header-bg);
-      backdrop-filter: blur(10px);
-      padding: 1rem 2rem;
+      backdrop-filter: blur(5px); /* Reduced initial blur */
+      padding: 1.5rem 2rem; /* Increased initial padding */
       box-shadow: var(--shadow);
       position: sticky; top: 0; z-index: 10;
       display: flex; justify-content: space-between; align-items: center;
-      transition: background 0.3s;
+      transition: padding 0.3s ease, background 0.3s ease, backdrop-filter 0.3s ease;
+    }
+
+    /* NEW: Scrolled state for header */
+    header.scrolled {
+        padding: 1rem 2rem;
+        backdrop-filter: blur(12px);
     }
 
     header .logo { font-size: 1.25rem; font-weight: bold; color: var(--accent); }
@@ -102,7 +175,7 @@
       left: 0;
       background-color: var(--accent);
       transform-origin: bottom right;
-      transition: transform 0.25s ease-out;
+      transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smoother transition */
     }
     nav a:hover::after {
       transform: scaleX(1);
@@ -110,9 +183,25 @@
     }
 
     main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+    
+    /* --- NEW: STAGGERED HERO ANIMATION --- */
     .hero { text-align: center; padding: 3rem 1rem; }
-    .hero h1 { font-size: 2.5rem; color: var(--heading); margin-bottom: 0.5rem; }
-    .hero p { color: var(--light); font-size: 1.1rem; }
+    .hero h1, .hero p {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.8s forwards;
+    }
+    .hero h1 { animation-delay: 0.2s; font-size: 2.5rem; color: var(--heading); margin-bottom: 0.5rem; }
+    .hero p { animation-delay: 0.4s; color: var(--light); font-size: 1.1rem; }
+
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    /* --- END HERO ANIMATION --- */
+
     section { margin-top: 3rem; }
     section h2 {
       font-size: 1.75rem;
@@ -122,7 +211,6 @@
       margin-bottom: 1rem;
     }
 
-    /* Standard cards remain solid for readability */
     .education-item, .skill-list-item, .experience-item, .contact-form {
       background: var(--bg-alt);
       padding: 1.5rem;
@@ -141,24 +229,38 @@
     .experience-item span { display: block; font-size: 0.9rem; color: var(--light); margin-bottom: 0.75rem; }
     .experience-item ul { list-style: disc inside; padding-left: 0.5rem;}
 
-
-    /* 4. Responsive auto fit grid */
     .projects-grid, .resume-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 1.5rem;
     }
 
-    /* 2. Glassmorphic card with hover lift - NOW VISIBLE */
+    /* --- IMPROVED: GLASSMORPHIC CARD WITH GLOW --- */
     .project-card {
-      background: var(--card-bg); /* Using variable for theme-based transparency */
+      background: var(--card-bg);
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px); /* For Safari */
+      -webkit-backdrop-filter: blur(10px);
       border-radius: 8px;
       padding: 1.5rem;
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative; /* Needed for pseudo-element */
+      overflow: hidden; /* Hide overflowing glow */
+    }
+    /* NEW: Glowing border effect */
+    .project-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), var(--glow-color), transparent 40%);
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+    .project-card:hover::before {
+        opacity: 1;
     }
     .project-card:hover {
       transform: translateY(-10px);
@@ -169,29 +271,54 @@
     .project-links a { font-size: 0.9rem; margin-right: 1rem; }
 
 
-    .contact-form label { display: block; margin-bottom: 0.25rem; font-weight: 600; }
+    /* --- NEW: FLOATING LABEL FORM --- */
+    .form-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    .contact-form label {
+        position: absolute;
+        top: 0.6rem;
+        left: 0.5rem;
+        color: var(--light);
+        pointer-events: none;
+        transition: all 0.2s ease;
+    }
     .contact-form input,
     .contact-form textarea {
       width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      border: 1px solid transparent;
-      border-radius: 4px;
+      padding: 0.7rem 0.5rem 0.3rem; /* Adjusted padding */
+      border: none;
+      border-bottom: 1px solid var(--light);
+      border-radius: 4px 4px 0 0;
       background-color: color-mix(in srgb, var(--text) 5%, transparent);
       color: var(--text);
     }
     .contact-form input:focus, .contact-form textarea:focus {
-        outline: 2px solid var(--accent);
+        outline: none;
+        border-bottom: 2px solid var(--accent);
     }
+    /* Animation for the label */
+    .contact-form input:focus + label,
+    .contact-form textarea:focus + label,
+    .contact-form input:not(:placeholder-shown) + label,
+    .contact-form textarea:not(:placeholder-shown) + label {
+        top: -1rem;
+        left: 0;
+        font-size: 0.8rem;
+        color: var(--accent);
+    }
+    /* Remove original label display block */
+    /* .contact-form label { display: block; margin-bottom: 0.25rem; font-weight: 600; } */
+    /* --- END FLOATING LABEL FORM --- */
 
-    /* 5. Ripple-on-click button */
     .contact-form button {
       background: var(--accent);
       color: white;
       padding: 0.6rem 1.2rem;
       border: none;
       border-radius: 4px;
-      cursor: pointer;
+      cursor: none; /* NEW: Use custom cursor */
       position: relative;
       overflow: hidden;
       transition: background 0.3s;
@@ -207,11 +334,10 @@
       to { transform: scale(4); opacity: 0; }
     }
 
-    /* Theme toggle switch */
     .theme-switch-wrapper { display: flex; align-items: center; }
     .theme-switch { display: inline-block; height: 24px; position: relative; width: 50px; }
     .theme-switch input { display:none; }
-    .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; }
+    .slider { background-color: #ccc; bottom: 0; cursor: none; left: 0; position: absolute; right: 0; top: 0; transition: .4s; }
     .slider:before { background-color: #fff; bottom: 4px; content: ""; height: 16px; left: 4px; position: absolute; transition: .4s; width: 16px; }
     input:checked + .slider { background-color: var(--accent); }
     input:checked + .slider:before { transform: translateX(26px); }
@@ -224,9 +350,48 @@
       font-size: 0.9rem;
       color: var(--light);
     }
+
+    /* --- NEW: SCROLL-TO-TOP BUTTON --- */
+    #scrollTopBtn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        background-color: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+        transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+        cursor: none; /* Use custom cursor */
+    }
+    #scrollTopBtn.visible {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+    #scrollTopBtn svg {
+        width: 24px;
+        height: 24px;
+    }
+    /* --- END SCROLL-TO-TOP BUTTON --- */
   </style>
 </head>
 <body>
+  <div id="preloader">
+      <div class="loader-spinner"></div>
+  </div>
+
+  <div class="cursor-outline"></div>
+  <div class="cursor-dot"></div>
+
   <canvas id="plexus-container"></canvas>
 
   <header>
@@ -251,12 +416,11 @@
   </header>
 
   <main>
-    <section class="hero" id="home" data-aos="fade-in">
+    <section class="hero" id="home">
       <h1>Hi, I’m Aadesh Minz</h1>
       <p>Hello! I'm Aadesh Minz, a driven Mathematics & Computer Science Engineering student at DAIICT (Gandhinagar), India. With a strong foundation in mathematics and computing.</p>
     </section>
 
-    <!-- 6. Aos fade in on scroll -->
     <section id="education" data-aos="fade-up">
       <h2>Education</h2>
       <div class="resume-grid">
@@ -355,12 +519,18 @@
     <section id="contact" data-aos="fade-up">
       <h2>Contact Me</h2>
       <form class="contact-form" action="https://formspree.io/f/yourformid" method="POST">
-        <label for="name">Name</label>
-        <input id="name" name="name" required />
-        <label for="email">Email</label>
-        <input id="email" type="email" name="_replyto" required />
-        <label for="message">Message</label>
-        <textarea id="message" name="message" rows="5" required></textarea>
+        <div class="form-group">
+          <input id="name" name="name" required placeholder=" " />
+          <label for="name">Name</label>
+        </div>
+        <div class="form-group">
+          <input id="email" type="email" name="_replyto" required placeholder=" " />
+          <label for="email">Email</label>
+        </div>
+        <div class="form-group">
+          <textarea id="message" name="message" rows="5" required placeholder=" "></textarea>
+          <label for="message">Message</label>
+        </div>
         <button type="submit">Send Message</button>
       </form>
     </section>
@@ -370,9 +540,21 @@
     <p>© 2025 Aadesh Minz | <a href="https://github.com/Minz31">GitHub</a></p>
   </footer>
 
+  <a id="scrollTopBtn" href="#home" aria-label="Scroll to top">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+    </svg>
+  </a>
+
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/plexus-effect/0.0.2/plexus-effect.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script>
+    /* --- NEW: PRELOADER LOGIC --- */
+    window.addEventListener('load', () => {
+        document.getElementById('preloader').classList.add('loaded');
+    });
+
     AOS.init({
         duration: 800,
         once: true,
@@ -419,8 +601,6 @@
             document.documentElement.setAttribute('data-theme', 'light');
             localStorage.setItem('theme', 'light');
         }
-        // Re-initialize plexus with the new theme colors after a short delay
-        // to allow CSS variables to update.
         setTimeout(() => initPlexus(e.target.checked ? 'dark' : 'light'), 50);
     }
 
@@ -443,9 +623,58 @@
         button.addEventListener("click", createRipple);
     });
 
-    // Initial load
-    // Use a small timeout to ensure the initial theme is fully applied before getting the color
+    // Initial load for plexus
     setTimeout(() => initPlexus(currentTheme || 'light'), 50);
+
+    /* --- NEW: ALL NEW JAVASCRIPT LOGIC --- */
+
+    // 1. DYNAMIC HEADER
+    const header = document.querySelector('header');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
+    // 2. SCROLL-TO-TOP BUTTON
+    const scrollTopBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
+    });
+
+    // 3. CUSTOM CURSOR
+    const cursorDot = document.querySelector(".cursor-dot");
+    const cursorOutline = document.querySelector(".cursor-outline");
+    window.addEventListener("mousemove", function (e) {
+        const posX = e.clientX;
+        const posY = e.clientY;
+        cursorDot.style.left = `${posX}px`;
+        cursorDot.style.top = `${posY}px`;
+        cursorOutline.style.left = `${posX}px`;
+        cursorOutline.style.top = `${posY}px`;
+    });
+
+    const interactiveElements = document.querySelectorAll('a, button, .slider');
+    interactiveElements.forEach((el) => {
+        el.addEventListener('mouseover', () => cursorOutline.classList.add('hover'));
+        el.addEventListener('mouseleave', () => cursorOutline.classList.remove('hover'));
+    });
+
+    // 4. PROJECT CARD GLOW EFFECT
+    document.querySelectorAll('.project-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+            card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+        });
+    });
+
   </script>
 </body>
 </html>
