@@ -110,7 +110,6 @@
     }
     /* --- END PRELOADER STYLES --- */
 
-
     /* --- NEW: CUSTOM CURSOR STYLES --- */
     .cursor-dot, .cursor-outline {
         pointer-events: none;
@@ -270,7 +269,6 @@
     .project-card p { font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--light); }
     .project-links a { font-size: 0.9rem; margin-right: 1rem; }
 
-
     /* --- NEW: FLOATING LABEL FORM --- */
     .form-group {
         position: relative;
@@ -308,9 +306,6 @@
         font-size: 0.8rem;
         color: var(--accent);
     }
-    /* Remove original label display block */
-    /* .contact-form label { display: block; margin-bottom: 0.25rem; font-weight: 600; } */
-    /* --- END FLOATING LABEL FORM --- */
 
     .contact-form button {
       background: var(--accent);
@@ -382,6 +377,49 @@
         height: 24px;
     }
     /* --- END SCROLL-TO-TOP BUTTON --- */
+
+    /* --- MUSIC TOGGLE + HIDDEN PLAYER --- */
+    #musicToggle {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      width: 45px;
+      height: 45px;
+      background-color: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 101;
+      opacity: 0.95;
+      box-shadow: var(--shadow);
+      transform: translateY(0);
+      transition: transform .2s, box-shadow .2s, opacity .2s;
+      cursor: none; /* keep custom cursor */
+    }
+    #musicToggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+      opacity: 1;
+    }
+    #musicToggle svg { width: 22px; height: 22px; }
+    #musicToggle .icon-pause { display: none; }
+    #musicToggle.playing .icon-play { display: none; }
+    #musicToggle.playing .icon-pause { display: block; }
+
+    /* Keep the YouTube iframe in DOM but visually hidden */
+    #lofi-player {
+      position: fixed;
+      bottom: 80px;
+      left: 20px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
   </style>
 </head>
 <body>
@@ -540,12 +578,25 @@
     <p>© 2025 Aadesh Minz | <a href="https://github.com/Minz31">GitHub</a></p>
   </footer>
 
+  <!-- Music toggle and hidden YT player -->
+  <button id="musicToggle" aria-label="Toggle Lofi Girl music" title="Lofi Girl">
+    <!-- Play Icon -->
+    <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M8 5v14l11-7z"></path>
+    </svg>
+    <!-- Pause Icon -->
+    <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+      <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+    </svg>
+  </button>
+  <div id="lofi-player" aria-hidden="true"></div>
+
   <a id="scrollTopBtn" href="#home" aria-label="Scroll to top">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
     </svg>
   </a>
-
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/plexus-effect/0.0.2/plexus-effect.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -675,6 +726,94 @@
         });
     });
 
+    /* --- LOFI GIRL MUSIC PLAYER --- */
+    const LOFI_VIDEO_ID = 'jfKfPfyJRdk'; // Lofi Girl 24/7 stream
+    const musicToggle = document.getElementById('musicToggle');
+
+    let ytPlayer;
+    let userWantsMusic = localStorage.getItem('music') === 'on';
+
+    // Load YouTube Iframe API
+    (function loadYT() {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    })();
+
+    // YouTube API callback
+    window.onYouTubeIframeAPIReady = function() {
+      ytPlayer = new YT.Player('lofi-player', {
+        width: '200',
+        height: '113',
+        videoId: LOFI_VIDEO_ID,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          playsinline: 1
+        },
+        events: {
+          onReady: onLofiReady
+        }
+      });
+    };
+
+    function setToggleUI(playing) {
+      musicToggle.classList.toggle('playing', playing);
+    }
+
+    function playMusic(unmuted = true) {
+      if (!ytPlayer) return;
+      if (unmuted) {
+        ytPlayer.unMute();
+        ytPlayer.setVolume(25);
+      } else {
+        ytPlayer.mute();
+      }
+      ytPlayer.playVideo();
+      setToggleUI(true);
+    }
+
+    function pauseMusic() {
+      if (!ytPlayer) return;
+      ytPlayer.pauseVideo();
+      setToggleUI(false);
+    }
+
+    function onLofiReady() {
+      if (userWantsMusic) {
+        // Start muted to improve autoplay success, then unmute on first gesture
+        playMusic(false);
+        const unlock = () => {
+          ytPlayer.unMute();
+          ytPlayer.setVolume(25);
+          window.removeEventListener('pointerdown', unlock);
+        };
+        window.addEventListener('pointerdown', unlock, { once: true });
+        setToggleUI(true);
+      } else {
+        setToggleUI(false);
+      }
+    }
+
+    musicToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!ytPlayer) return;
+
+      const state = ytPlayer.getPlayerState ? ytPlayer.getPlayerState() : -1;
+      const isPlaying = state === 1 || state === 3; // 1=PLAYING, 3=BUFFERING
+
+      if (isPlaying) {
+        pauseMusic();
+        userWantsMusic = false;
+        localStorage.setItem('music', 'off');
+      } else {
+        playMusic(true); // explicit click -> play unmuted
+        userWantsMusic = true;
+        localStorage.setItem('music', 'on');
+      }
+    });
   </script>
 </body>
 </html>
